@@ -1,0 +1,269 @@
+{% load i18n %}
+<header class="bg-white shadow-sm border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+            <div class="flex items-center space-x-3">
+                <!-- Logo -->
+                {% if settings.logo %}
+                    <img src="{{ settings.logo.url }}"
+                         alt="Logo"
+                         class="h-8 w-auto max-h-12 object-contain"/>
+                {% else %}
+                    <div class="h-8 w-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-edit text-white text-lg"></i>
+                    </div>
+                {% endif %}
+
+                {% if mode == "editing" %}
+                    <h1 class="text-xl font-semibold text-gray-900 drop-shadow">
+                        {% if factory_id %}Factory{% else %}Portal{% endif %} Edit Mode
+                    </h1>
+                    <span class="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium">
+                        EDITING
+                    </span>
+                {% else %}
+                    <h1 class="text-xl font-semibold text-gray-900">{% trans 'Enterprise Systems Portal' %}</h1>
+                {% endif %}
+            </div>
+
+            {% if mode == 'editing' %}
+                <div class="flex items-center space-x-4">
+                    <div class="text-sm text-gray-500">
+                        <i class="fas fa-clock mr-1"></i>
+                        <span id="current-time"></span>
+                    </div>
+                    <!-- Language Selector -->
+                    <div class="relative group">
+                        <button id="language-toggle"
+                                class="flex items-center space-x-2 px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
+                            {% get_current_language as CURRENT_LANG %}
+                            <span class="fa fa-language" style="font-size: 24px"></span>
+                            <span class="text-sm">
+                            {% if CURRENT_LANG == 'vi' %}Tiếng Việt
+                            {% elif CURRENT_LANG == 'zh-hans' %}简体中文
+                            {% elif CURRENT_LANG == 'zh-hant' %}繁體中文
+                            {% else %}English{% endif %}
+                        </span>
+                            <i id="language-chevron"
+                               class="fas fa-chevron-down text-xs transition-transform duration-200"></i>
+                        </button>
+
+                        <div id="language-menu"
+                             class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 border border-gray-200 transition-all duration-200 opacity-0 transform scale-95 origin-top-right">
+                            <div class="py-1">
+                                <form action="{% url 'set_language' %}" method="post" class="w-full">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{{ request.path }}">
+                                    <button type="submit" name="language" value="en"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-left
+                                       {% if LANGUAGE_CODE == 'en' %}bg-gray-100 font-semibold{% else %}text-gray-700{% endif %}
+                                       hover:bg-gray-100">
+                                        <span class="fi fi-us mr-2"></span> English (en)
+                                    </button>
+                                </form>
+
+                                <form action="{% url 'set_language' %}" method="post" class="w-full">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{{ request.path }}">
+                                    <button type="submit" name="language" value="vi"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-left
+                                       {% if LANGUAGE_CODE == 'vi' %}bg-gray-100 font-semibold{% else %}text-gray-700{% endif %}
+                                       hover:bg-gray-100">
+                                        <span class="fi fi-vn mr-2"></span> Tiếng Việt (vi)
+                                    </button>
+                                </form>
+
+                                <form action="{% url 'set_language' %}" method="post" class="w-full">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{{ request.path }}">
+                                    <button type="submit" name="language" value="zh-hans"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-left
+                                       {% if LANGUAGE_CODE == 'zh-hans' %}bg-gray-100 font-semibold{% else %}text-gray-700{% endif %}
+                                       hover:bg-gray-100">
+                                        <span class="fi fi-cn mr-2"></span> 简体中文 (zh-hant)
+                                    </button>
+                                </form>
+
+                                <form action="{% url 'set_language' %}" method="post" class="w-full">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{{ request.path }}">
+                                    <button type="submit" name="language" value="zh-hant"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-left
+                                       {% if LANGUAGE_CODE == 'zh-hant' %}bg-gray-100 font-semibold{% else %}text-gray-700{% endif %}
+                                       hover:bg-gray-100">
+                                        <span class="fi fi-tw mr-2"></span> 繁體中文 (zh-hans)
+                                    </button>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="saveAllChanges()"
+                            class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                        <i class="fas fa-save mr-2"></i>Save All
+                    </button>
+                    <a href="{% if factory_id %}{% url 'factory' %}?id={{ factory_id }}{% else %}{% url 'home' %}{% endif %}"
+                       class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-eye mr-2"></i>Preview
+                    </a>
+                    <a href="{% if factory_id %}{% url 'factory' %}?id={{ factory_id }}{% else %}{% url 'home' %}{% endif %}"
+                       class="text-gray-500 hover:text-gray-700 transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </a>
+                </div>
+            {% else %}
+                <div class="flex items-center space-x-4">
+                    <div class="text-sm text-gray-500">
+                        <i class="fas fa-clock mr-1"></i>
+                        <span id="current-time"></span>
+                    </div>
+                    <!-- Language Selector -->
+                    <div class="relative group">
+                        <button id="language-toggle"
+                                class="flex items-center space-x-2 px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
+                            {% get_current_language as CURRENT_LANG %}
+                            <span class="fa fa-language" style="font-size: 24px"></span>
+                            <span class="text-sm">
+                            {% if CURRENT_LANG == 'vi' %}Tiếng Việt
+                            {% elif CURRENT_LANG == 'zh-hans' %}简体中文
+                            {% elif CURRENT_LANG == 'zh-hant' %}繁體中文
+                            {% else %}English{% endif %}
+                        </span>
+                            <i id="language-chevron"
+                               class="fas fa-chevron-down text-xs transition-transform duration-200"></i>
+                        </button>
+
+                        <div id="language-menu"
+                             class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 border border-gray-200 transition-all duration-200 opacity-0 transform scale-95 origin-top-right">
+                            <div class="py-1">
+                                <form action="{% url 'set_language' %}" method="post" class="w-full">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{{ request.path }}">
+                                    <button type="submit" name="language" value="en"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-left
+                                       {% if LANGUAGE_CODE == 'en' %}bg-gray-100 font-semibold{% else %}text-gray-700{% endif %}
+                                       hover:bg-gray-100">
+                                        <span class="fi fi-us mr-2"></span> English (en)
+                                    </button>
+                                </form>
+
+                                <form action="{% url 'set_language' %}" method="post" class="w-full">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{{ request.path }}">
+                                    <button type="submit" name="language" value="vi"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-left
+                                       {% if LANGUAGE_CODE == 'vi' %}bg-gray-100 font-semibold{% else %}text-gray-700{% endif %}
+                                       hover:bg-gray-100">
+                                        <span class="fi fi-vn mr-2"></span> Tiếng Việt (vi)
+                                    </button>
+                                </form>
+
+                                <form action="{% url 'set_language' %}" method="post" class="w-full">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{{ request.path }}">
+                                    <button type="submit" name="language" value="zh-hans"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-left
+                                       {% if LANGUAGE_CODE == 'zh-hans' %}bg-gray-100 font-semibold{% else %}text-gray-700{% endif %}
+                                       hover:bg-gray-100">
+                                        <span class="fi fi-cn mr-2"></span> 简体中文 (zh-hant)
+                                    </button>
+                                </form>
+
+                                <form action="{% url 'set_language' %}" method="post" class="w-full">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{{ request.path }}">
+                                    <button type="submit" name="language" value="zh-hant"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-left
+                                       {% if LANGUAGE_CODE == 'zh-hant' %}bg-gray-100 font-semibold{% else %}text-gray-700{% endif %}
+                                       hover:bg-gray-100">
+                                        <span class="fi fi-tw mr-2"></span> 繁體中文 (zh-hans)
+                                    </button>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if user.is_authenticated %}
+                        <div class="flex items-center space-x-3">
+                            <span class="text-sm text-gray-700">{% trans 'Welcome' %}, {{ user.username }}</span>
+                            {% if user.is_staff %}
+                                <a href="{% url 'edit_mode' %}{% if factory_id %}?factory={{ factory_id }}{% endif %}"
+                                   class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors">
+                                    <i class="fas fa-edit mr-1"></i>Edit Mode
+                                </a>
+                            {% endif %}
+                            <a href="{% url 'logout' %}"
+                               class="text-gray-500 hover:text-gray-700 transition-colors">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </a>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'login' %}"
+                           class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-sign-in-alt mr-2"></i>Login
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</header>
+
+<script>
+    // Language menu toggle
+    const languageToggle = document.getElementById('language-toggle');
+    const languageMenu = document.getElementById('language-menu');
+    const languageChevron = document.getElementById('language-chevron');
+
+    let languageMenuOpen = false;
+
+    languageToggle.addEventListener('click', () => {
+        languageMenuOpen = !languageMenuOpen;
+
+        if (languageMenuOpen) {
+            languageMenu.classList.remove('hidden', 'opacity-0', 'scale-95');
+            languageMenu.classList.add('opacity-100', 'scale-100');
+            languageChevron.classList.add('transform', 'rotate-180');
+        } else {
+            languageMenu.classList.remove('opacity-100', 'scale-100');
+            languageMenu.classList.add('opacity-0', 'scale-95');
+            setTimeout(() => {
+                languageMenu.classList.add('hidden');
+            }, 200);
+            languageChevron.classList.remove('transform', 'rotate-180');
+        }
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!languageToggle.contains(e.target) && !languageMenu.contains(e.target)) {
+            languageMenuOpen = false;
+            languageMenu.classList.remove('opacity-100', 'scale-100');
+            languageMenu.classList.add('opacity-0', 'scale-95');
+            setTimeout(() => {
+                languageMenu.classList.add('hidden');
+            }, 200);
+            languageChevron.classList.remove('transform', 'rotate-180');
+        }
+    });
+
+    // Update current time
+    function updateTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('en-US', {
+            hour12: false,
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        const dateString = now.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        });
+        document.getElementById('current-time').textContent = `${dateString} ${timeString}`;
+    }
+
+    updateTime();
+    setInterval(updateTime, 1000);
+</script>

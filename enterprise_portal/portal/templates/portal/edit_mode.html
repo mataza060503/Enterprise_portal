@@ -1,0 +1,1099 @@
+{% extends 'base/base.html' %}
+{% load i18n %}
+
+
+{% block title %}{% trans 'Edit Mode' %}{% endblock %}
+{% block header %}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block css %}
+    <style>
+        .modal-backdrop {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .slide-in-right {
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .drag-over {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+
+        .sortable-ghost {
+            opacity: 0.5;
+        }
+
+        .dropdown-menu {
+            min-width: auto !important; /* remove fixed Bootstrap width */
+            width: max-content !important; /* fit content */
+            max-width: 400px; /* optional: limit max size */
+        }
+
+        /* Make sure the grid uses full width inside */
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(80px, 1fr));
+            gap: 10px;
+        }
+
+        .icon-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: .75rem;
+            border-radius: .5rem;
+            border: 1px solid transparent;
+            transition: all .2s ease;
+            cursor: pointer;
+        }
+
+        .icon-option i {
+            font-size: 1.25rem;
+            margin-bottom: .25rem;
+            color: #495057;
+        }
+
+        .icon-option span {
+            font-size: .75rem;
+            color: #495057;
+        }
+
+        .icon-option:hover {
+            background-color: #f0f8ff;
+            border-color: #0d6efd;
+            transform: scale(1.05);
+        }
+
+        .icon-option.active {
+            background-color: #e7f1ff;
+            border-color: #0d6efd;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    {% with mode="editing" %}
+        {{ block.super }}
+    {% endwith %}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Left Sidebar - Settings Panel -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sticky top-8">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Portal Settings</h3>
+
+                    <!-- Settings Form -->
+                    <form id="settings-form" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Site Title</label>
+                            <input type="text" name="site_title" id="site-title" value="{{ settings.site_title }}"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Theme Color</label>
+                            <input type="color" name="theme_color" id="theme-color" value="{{ settings.theme_color }}"
+                                   class="w-full h-10 border border-gray-300 rounded-lg cursor-pointer">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Background Color</label>
+                            <input type="color" name="background_color" id="background-color" value="{{ settings.background_color }}"
+                                   class="w-full h-10 border border-gray-300 rounded-lg cursor-pointer">
+                        </div>
+
+                        <!-- Logo + Favicon in the same row -->
+                        <div class="grid grid-cols-2 gap-10">
+
+                            <!-- Logo Upload -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Logo Image</label>
+                                <input type="file" name="logo" id="logo" accept="image/*" class="hidden">
+                                <img src="{{ settings.logo.url|default:'/media/system/no_image.jpg' }}"
+                                     alt="Logo Preview"
+                                     class="h-24 w-24 cursor-pointer rounded-lg border border-gray-300 hover:opacity-80 object-contain bg-gray-50"
+                                     onclick="document.getElementById('logo').click()">
+                            </div>
+
+                            <!-- Favicon Upload -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Favicon</label>
+                                <input type="file" name="favicon" id="favicon" accept="image/*" class="hidden">
+                                <img src="{{ settings.favicon.url|default:'/media/system/no_image.jpg' }}"
+                                     alt="Favicon Preview"
+                                     class="h-24 w-24 cursor-pointer rounded-md border border-gray-300 hover:opacity-80 object-contain bg-gray-50"
+                                     onclick="document.getElementById('favicon').click()">
+                            </div>
+
+                        </div>
+
+                        <!-- Background Image Upload -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Background Image</label>
+                            <input type="file" name="background_image" id="background-image" accept="image/*"
+                                   class="hidden">
+                            <img src="{{ settings.background_image.url|default:'/media/system/no_image.jpg' }}"
+                                 alt="Background Preview"
+                                 class="h-32 w-full object-cover cursor-pointer rounded-lg border border-gray-300 hover:opacity-80"
+                                 onclick="document.getElementById('background-image').click()">
+                        </div>
+
+                        <div class="flex items-center space-x-3">
+                            <input type="checkbox" name="show_status_indicators" id="show-status" {{ settings.show_status_indicators|yesno:'checked,' }}
+                                   class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <label for="show-status" class="text-sm text-gray-700">Show Status Indicators</label>
+                        </div>
+
+                        <div class="flex items-center space-x-3">
+                            <input type="checkbox" name="enable_animations" id="enable-animations" {{ settings.enable_animations|yesno:'checked,' }}
+                                   class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <label for="enable-animations" class="text-sm text-gray-700">Enable Animations</label>
+                        </div>
+
+                        <div class="flex items-center space-x-3 hidden">
+                            <input type="checkbox" name="maintenance_mode" id="maintenance-mode" {{ settings.maintenance_mode|yesno:'checked,' }}
+                                   class="rounded border-gray-300 text-red-600 focus:ring-red-500">
+                            <label for="maintenance-mode" class="text-sm text-gray-700">Maintenance Mode</label>
+                        </div>
+
+                    </form>
+
+                    <hr class="my-6">
+
+                    <!-- Quick Actions -->
+                    <div class="space-y-3">
+                        <button onclick="openCreateSectionModal()"
+                                class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-plus mr-2"></i>Add Section
+                        </button>
+
+                        <button onclick="openCreateCardModal()"
+                                class="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                            <i class="fas fa-plus mr-2"></i>Add Card
+                        </button>
+
+{#                        <button onclick="exportSettings()"#}
+{#                                class="w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">#}
+{#                            <i class="fas fa-download mr-2"></i>Export Settings#}
+{#                        </button>#}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="lg:col-span-3">
+                {% if factory_id == None %}
+                    <!-- Factory Buttons Section -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
+                        <div class="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-t-xl">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+                                        <i class="fas fa-industry text-white text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-gray-900">Factory Buttons</h3>
+                                        <p class="text-sm text-gray-600">Manage factory navigation buttons</p>
+                                    </div>
+                                </div>
+                                <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-xs font-medium">
+                                    {{ factory_buttons|length }} Factories
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="factory-buttons-container">
+                                {% for factory in factory_buttons %}
+                                <div class="group relative bg-gradient-to-br from-gray-50 to-gray-100 border-2 border-gray-200 rounded-xl p-4 hover:border-purple-300 transition-all duration-300 hover:shadow-md factory-item cursor-move"
+                                     data-factory-id="{{ factory.id }}" style="background: linear-gradient(135deg, {{ factory.background_color }}20, {{ factory.background_color }}10);">
+                                    <div class="flex items-start justify-between mb-3">
+                                        <div class="flex items-center space-x-3 flex-1">
+                                            <div class="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm"
+                                                 style="background-color: {{ factory.background_color }};">
+                                                <i class="fas fa-{{ factory.icon }} text-xl" style="color: {{ factory.text_color }};"></i>
+                                            </div>
+                                            <div class="flex-1">
+                                                <h4 class="font-semibold text-gray-900 editable-title"
+                                                   data-field="name" data-id="{{ factory.id }}" data-type="factory">
+                                                    {{ factory.name }}
+                                                </h4>
+                                                <p class="text-sm text-gray-600 editable-description"
+                                                   data-field="description" data-id="{{ factory.id }}" data-type="factory">
+                                                    {{ factory.description|default:"Click to add description" }}
+                                                </p>
+                                                <div class="mt-1">
+                                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-{{ factory.access_level }}-100 text-{{ factory.access_level }}-800">
+                                                        <div class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1"></div>
+                                                        {{ factory.access_level|capfirst }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center justify-between pt-3 border-t border-gray-200">
+                                        <div class="text-xs text-gray-500 truncate flex-1 mr-3">
+                                            <i class="fas fa-link mr-1"></i>
+                                            {{ factory.url }}
+                                        </div>
+                                        <div class="flex items-center space-x-1">
+                                            <button onclick="openEditFactoryModal({{ factory.id }}, '{{ factory.name }}', '{{ factory.name_vi }}', '{{ factory.name_zh_hant }}', '{{ factory.name_zh_hans }}', '{{ factory.description }}', '{{ factory.description_vi }}', '{{ factory.description_zh_hant }}', '{{ factory.description_zh_hans }}', '{{ factory.url }}', '{{ factory.icon }}', '{{ factory.background_color }}', '{{ factory.text_color }}', {{ factory.is_active|yesno:'true,false' }}, '{{ factory.access_level }}', {{ factory.order }})"
+                                                    class="text-blue-600 hover:text-blue-700 p-1.5 rounded-lg hover:bg-blue-50 transition-colors">
+                                                <i class="fas fa-edit text-xs"></i>
+                                            </button>
+                                            <button onclick="deleteFactory({{ factory.id }})"
+                                                    class="text-red-600 hover:text-red-700 p-1.5 rounded-lg hover:bg-red-50 transition-colors">
+                                                <i class="fas fa-trash text-xs"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+
+                                <!-- Add Factory Button -->
+                                <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 flex items-center justify-center hover:border-purple-400 transition-colors cursor-pointer"
+                                     onclick="openCreateFactoryModal()">
+                                    <div class="text-center text-gray-500">
+                                        <i class="fas fa-plus text-2xl mb-2"></i>
+                                        <p class="text-sm font-medium">Add Factory</p>
+                                        <p class="text-xs">Create new factory button</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Sections List -->
+                <div id="sections-container" class="space-y-6">
+                    {% for section in sections %}
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 section-item" data-section-id="{{ section.id }}">
+                        <!-- Section Header -->
+                        <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 rounded-t-xl">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 rounded-lg flex items-center justify-center cursor-move"
+                                         style="background-color: {{ section.color }};">
+                                        <i class="fas fa-{{ section.icon }} text-white text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-gray-900 editable-title"
+                                            data-field="name" data-id="{{ section.id }}" data-type="section">
+                                            {{ section.name }}
+                                        </h3>
+                                        <p class="text-sm text-gray-600 editable-description"
+                                           data-field="description" data-id="{{ section.id }}" data-type="section">
+                                            {{ section.description|default:"Click to add description" }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center space-x-2">
+                                    <button onclick="openEditSectionModal({{ section.id }}, '{{ section.name }}', '{{ section.name_vi }}', '{{ section.name_zh_hant }}', '{{ section.name_zh_hans }}', '{{ section.description }}', '{{ section.description_vi }}', '{{ section.description_zh_hant }}', '{{ section.description_zh_hans }}', '{{ section.icon }}', '{{ section.color }}', {{ section.is_active|yesno:"true,false" }}, {{ section.order }})"
+                                            class="text-blue-600 hover:text-blue-700 p-2 rounded-lg hover:bg-blue-50 transition-colors">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button onclick="deleteSection({{ section.id }})"
+                                            class="text-red-600 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-colors">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    <div class="cursor-move text-gray-400 p-2">
+                                        <i class="fas fa-grip-vertical"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cards Grid -->
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 cards-container"
+                                 data-section-id="{{ section.id }}">
+                                {% for card in section.cards.all %}
+                                <div class="bg-white border-2 border-gray-200 rounded-xl p-4 card-item hover:border-blue-300 transition-colors cursor-move"
+                                     data-card-id="{{ card.id }}">
+                                    <div class="flex items-start justify-between mb-3">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-10 h-10 rounded-lg flex items-center justify-center"
+                                                 style="background-color: {{ card.icon_color }}20;">
+                                                <i class="fas fa-{{ card.icon }}" style="color: {{ card.icon_color }};"></i>
+                                            </div>
+                                            <div class="flex-1">
+                                                <h4 class="font-medium text-gray-900 editable-title"
+                                                   data-field="name" data-id="{{ card.id }}" data-type="card">
+                                                    {{ card.name }}
+                                                </h4>
+                                                <p class="text-sm text-gray-600 editable-description"
+                                                   data-field="description" data-id="{{ card.id }}" data-type="card">
+                                                    {{ card.description|default:"Click to add description" }}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex items-center space-x-1">
+                                            <button onclick="openEditCardModal({{ section.id }}, {{ card.pk }}, '{{ card.name }}', '{{ card.name_vi }}', '{{ card.name_zh_hant }}', '{{ card.name_zh_hans }}', '{{ card.description }}', '{{ card.description_vi }}', '{{ card.description_zh_hant }}', '{{ card.description_zh_hans }}', '{{ card.url }}', '{{ card.icon }}', '{{ card.icon_color }}', '{{ card.status }}', {{ card.is_active|yesno:"true,false" }}, {{ card.is_external|yesno:"true,false" }}, '{{ card.access_level }}', {{ card.order }})"
+                                                    class="text-blue-600 hover:text-blue-700 p-1 rounded hover:bg-blue-50 transition-colors">
+                                                <i class="fas fa-edit text-xs"></i>
+                                            </button>
+                                            <button onclick="deleteCard({{ card.id }})"
+                                                    class="text-red-600 hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors">
+                                                <i class="fas fa-trash text-xs"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-sm text-gray-500">
+                                        <div class="flex items-center justify-between">
+                                            <span class="flex items-center">
+                                                <div class="w-2 h-2 rounded-full mr-2 status-{{ card.status }}"
+                                                     style="background-color: {% if card.status == 'online' %}#10b981{% elif card.status == 'offline' %}#ef4444{% else %}#f59e0b{% endif %};"></div>
+                                                {{ card.status|capfirst }}
+                                            </span>
+                                            <span class="text-xs">{{ card.access_level|capfirst }}</span>
+                                        </div>
+                                        <div class="mt-2 text-xs truncate">
+                                            <i class="fas fa-link mr-1"></i>
+                                            {{ card.url }}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+
+                                <!-- Add Card Button -->
+                                <div class="border-2 border-dashed border-gray-300 rounded-xl p-4 flex items-center justify-center hover:border-blue-400 transition-colors cursor-pointer add-card-btn"
+                                     onclick="openCreateCardModal({{ section.id }})">
+                                    <div class="text-center text-gray-500">
+                                        <i class="fas fa-plus text-2xl mb-2"></i>
+                                        <p class="text-sm">Add Card</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <!-- Add Section Button -->
+                    <div class="p-2 bg-white shadow rounded-xl">
+                        <div class="bg-white border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-blue-400 transition-colors cursor-pointer"
+                             onclick="openCreateSectionModal()">
+                            <div class="text-gray-500">
+                                <i class="fas fa-plus text-4xl mb-4"></i>
+                                <p class="text-lg font-medium">Add New Section</p>
+                                <p class="text-sm">Create a new portal section</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- modals -->
+    {% include 'modal/portal_factory.html' %}
+    {% include 'modal/portal_section.html' %}
+    {% include 'modal/portal_card.html' %}
+
+    <!-- Success/Error Toast -->
+    <div id="toast" class="fixed top-4 right-4 bg-white rounded-lg shadow-lg border border-gray-200 p-4 transform translate-x-full opacity-0 transition-all duration-300 z-50">
+        <div class="flex items-center space-x-3">
+            <div id="toast-icon" class="w-8 h-8 rounded-full flex items-center justify-center">
+                <i id="toast-icon-inner" class="fas fa-check text-white"></i>
+            </div>
+            <div>
+                <p id="toast-message" class="text-sm font-medium text-gray-900"></p>
+            </div>
+            <button onclick="hideToast()" class="text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <script>
+        let isDirty = false;
+
+        // Initialize sortable for sections and cards
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSortables();
+            setupInlineEditing();
+        });
+
+        function initializeSortables() {
+            // Make sections sortable
+            const sectionsContainer = document.getElementById('sections-container');
+            if (sectionsContainer) {
+                new Sortable(sectionsContainer, {
+                    handle: '.cursor-move',
+                    ghostClass: 'sortable-ghost',
+                    chosenClass: 'sortable-chosen',
+                    dragClass: 'sortable-drag',
+                    animation: 150,
+                    onEnd: function(evt) {
+                        updateSectionOrder();
+                        markDirty();
+                    }
+                });
+            }
+
+            // Make factory buttons sortable
+            const factoryContainer = document.getElementById('factory-buttons-container');
+            if (factoryContainer) {
+                new Sortable(factoryContainer, {
+                    filter: '.add-factory-btn, .border-dashed', // Exclude the "Add Factory" button
+                    preventOnFilter: false,
+                    ghostClass: 'sortable-ghost',
+                    chosenClass: 'sortable-chosen',
+                    dragClass: 'sortable-drag',
+                    animation: 150,
+                    onEnd: function(evt) {
+                        updateFactoryOrder();
+                        markDirty();
+                    }
+                });
+            }
+
+            // Make cards sortable within each section
+            document.querySelectorAll('.cards-container').forEach(container => {
+                new Sortable(container, {
+                    group: 'cards',
+                    filter: '.add-card-btn, .border-dashed', // Exclude the "Add Card" button
+                    preventOnFilter: false,
+                    ghostClass: 'sortable-ghost',
+                    chosenClass: 'sortable-chosen',
+                    dragClass: 'sortable-drag',
+                    animation: 150,
+                    onEnd: function(evt) {
+                        updateCardOrder(evt.to.dataset.sectionId);
+                        markDirty();
+                    }
+                });
+            });
+        }
+
+        function setupInlineEditing() {
+            // Make titles and descriptions editable
+            document.querySelectorAll('.editable-title, .editable-description').forEach(element => {
+                element.addEventListener('click', function() {
+                    makeEditable(this);
+                });
+            });
+        }
+
+        function makeEditable(element) {
+            if (element.querySelector('input') || element.querySelector('textarea')) return;
+
+            const currentValue = element.textContent.trim();
+            const field = element.dataset.field;
+            const isTextarea = field === 'description';
+
+            const input = document.createElement(isTextarea ? 'textarea' : 'input');
+            input.value = currentValue === 'Click to add description' ? '' : currentValue;
+            input.className = 'w-full px-2 py-1 border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500';
+
+            if (isTextarea) {
+                input.rows = 2;
+            }
+
+            element.innerHTML = '';
+            element.appendChild(input);
+            input.focus();
+
+            function saveEdit() {
+                const newValue = input.value.trim();
+                element.textContent = newValue || (isTextarea ? 'Click to add description' : 'Untitled');
+
+                // Save to server
+                saveInlineEdit(element.dataset.type, element.dataset.id, field, newValue);
+                markDirty();
+            }
+
+            input.addEventListener('blur', saveEdit);
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    saveEdit();
+                }
+                if (e.key === 'Escape') {
+                    element.textContent = currentValue;
+                }
+            });
+        }
+
+        async function saveInlineEdit(type, id, field, value) {
+            try {
+                const url = `/api/${type}s/${id}/update/`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                    body: JSON.stringify({ [field]: value })
+                });
+
+                const result = await response.json();
+                if (!result.success) {
+                    throw new Error(result.error || 'Failed to save changes');
+                }
+            } catch (error) {
+                console.error('Save error:', error);
+                showToast('Error saving changes: ' + error.message, 'error');
+            }
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Factory Modal Functions
+        function openCreateFactoryModal() {
+            const form = document.getElementById('create-factory-form');
+            form.reset();
+            document.getElementById('factoryModalTitle').innerText = "Create New Factory";
+            document.getElementById('factoryModalSubmitButton').onclick = async function () {
+                await createEditFactory()
+            };
+            document.getElementById('factoryModalSubmitButton').innerText = "Create Factory"
+            openModal('create-factory-modal');
+        }
+
+        function openEditFactoryModal(factoryId,
+                                      name, name_vi, name_zh_hant, name_zh_hans,
+                                      description, description_vi, description_zh_hant, description_zh_hans,
+                                      url, icon, backgroundColor, textColor, isActive, accessLevel, order) {
+            document.getElementById('factoryModalTitle').innerText = `Edit ${name} Factory`;
+            document.querySelector('#create-factory-form input[name="name"]').value = name;
+            document.querySelector('#create-factory-form input[name="name_vi"]').value = name_vi;
+            document.querySelector('#create-factory-form input[name="name_zh_hant"]').value = name_zh_hant;
+            document.querySelector('#create-factory-form input[name="name_zh_hans"]').value = name_zh_hans;
+            document.querySelector('#create-factory-form textarea[name="description"]').value = description;
+            document.querySelector('#create-factory-form textarea[name="description_vi"]').value = description_vi;
+            document.querySelector('#create-factory-form textarea[name="description_zh_hant"]').value = description_zh_hant;
+            document.querySelector('#create-factory-form textarea[name="description_zh_hans"]').value = description_zh_hans;
+            document.querySelector('#create-factory-form input[name="url"]').value = url;
+            document.querySelector('#create-factory-form input[name="icon"]').value = icon;
+            document.getElementById('factory_dropdown_icon').className = `fas fa-${icon} me-2`;
+            document.getElementById('factory_dropdown_label').textContent = icon;
+            document.querySelector('#create-factory-form input[name="background_color"]').value = backgroundColor;
+            document.querySelector('#create-factory-form input[name="text_color"]').value = textColor;
+            document.querySelector('#create-factory-form select[name="access_level"]').value = accessLevel;
+            document.getElementById('factoryModalSubmitButton').onclick = async function() { await createEditFactory(factoryId, order)};
+            document.getElementById('factoryModalSubmitButton').innerText = "Edit Factory"
+            openModal('create-factory-modal');
+        }
+
+        async function createEditFactory(factory_id, order) {
+            const form = document.getElementById('create-factory-form');
+            const formData = new FormData(form);
+
+            let order_value = factory_id ? order : document.querySelectorAll('.factory-item').length;
+
+            const data = {
+                name: formData.get('name'),
+                name_en: formData.get('name_en'),
+                name_vi: formData.get('name_vi'),
+                name_zh_hant: formData.get('name_zh_hant'),
+                name_zh_hans: formData.get('name_zh_hans'),
+                description: formData.get('description'),
+                description_vi: formData.get('description_vi'),
+                description_zh_hant: formData.get('description_zh_hant'),
+                description_zh_hans: formData.get('description_zh_hans'),
+                url: formData.get('url'),
+                icon: formData.get('icon'),
+                background_color: formData.get('background_color'),
+                text_color: formData.get('text_color'),
+                access_level: formData.get('access_level'),
+                order: order_value
+            };
+
+            try {
+                const url = factory_id ? `/api/factories/${factory_id}/update/` : '/api/factories/create/';
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    {% comment %}if (factory_id) {
+                        showToast('Factory updated successfully!', 'success');
+                    } else {
+                        showToast('Factory created successfully!', 'success');
+                    }{% endcomment %}
+                    closeModal('create-factory-modal');
+                    form.reset();
+                    isDirty = false;
+                    location.reload();
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                showToast('Error saving factory: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteFactory(factoryId) {
+            if (!confirm('Are you sure you want to delete this factory button?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/factories/${factoryId}/delete/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Factory deleted successfully!', 'success');
+                    document.querySelector(`[data-factory-id="${factoryId}"]`).remove();
+                    markDirty();
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                showToast('Error deleting factory: ' + error.message, 'error');
+            }
+        }
+
+        function openCreateCardModal(sectionId) {
+            const form = document.getElementById('create-card-form');
+            form.reset();
+            if (sectionId) {
+                document.querySelector('#create-card-form select[name="section_id"]').value = sectionId;
+            }
+            document.getElementById('cardModalTitle').innerText = "Create New Card";
+            document.getElementById('cardModalSubmitButton').onclick = async function () {
+                await createEditCard()
+            };
+            document.getElementById('cardModalSubmitButton').innerText = "Create Card"
+            openModal('create-card-modal');
+        }
+
+        function openEditCardModal(sectionId, cardId,
+                                   name, name_vi, name_zh_hant, name_zh_hans,
+                                   description, description_vi, description_zh_hant, description_zh_hans,
+                                   url, icon, iconColor, status, isActive, isExternal, accessLevel, order) {
+            if (sectionId) {
+                document.getElementById('cardModalTitle').innerText = `Edit ${name} Card`;
+                document.querySelector('#create-card-form select[name="section_id"]').value = sectionId;
+                document.querySelector('#create-card-form input[name="name"]').value = name;
+                document.querySelector('#create-card-form input[name="name_vi"]').value = name_vi;
+                document.querySelector('#create-card-form input[name="name_zh_hant"]').value = name_zh_hant;
+                document.querySelector('#create-card-form input[name="name_zh_hans"]').value = name_zh_hans;
+                document.querySelector('#create-card-form textarea[name="description"]').value = description;
+                document.querySelector('#create-card-form textarea[name="description_vi"]').value = description_vi;
+                document.querySelector('#create-card-form textarea[name="description_zh_hant"]').value = description_zh_hant;
+                document.querySelector('#create-card-form textarea[name="description_zh_hans"]').value = description_zh_hans;
+                document.querySelector('#create-card-form input[name="url"]').value = url;
+                document.querySelector('#create-card-form input[name="icon"]').value = icon;
+                document.getElementById('card_dropdown_icon').className = `fas fa-${icon} me-2`;
+                document.getElementById('card_dropdown_label').textContent = icon;
+                document.querySelector('#create-card-form input[name="icon_color"]').value = iconColor;
+                document.querySelector('#create-card-form select[name="status"]').value = status;
+                document.querySelector('#create-card-form select[name="access_level"]').value = accessLevel;
+                document.getElementById('is-external').checked = isExternal;
+                document.getElementById('cardModalSubmitButton').onclick = async function() { await createEditCard(cardId, order)};
+                document.getElementById('cardModalSubmitButton').innerText = "Edit Card"
+            }
+            openModal('create-card-modal');
+        }
+
+        function openCreateSectionModal(){
+            const form = document.getElementById('create-section-form');
+            form.reset();
+            document.getElementById('sectionModalTitle').innerText = "Create New Section";
+            document.getElementById('sectionModalSubmitButton').onclick = async function () {
+                await createEditSection()
+            };
+            document.getElementById('sectionModalSubmitButton').innerText = "Create Section"
+            openModal('create-section-modal');
+        }
+
+        function openEditSectionModal(sectionId,
+                                      name, name_vi, name_zh_hant, name_zh_hans,
+                                      description, description_vi, description_zh_hant, description_zh_hans,
+                                      icon, color, isActive, order){
+            if (sectionId) {
+                document.getElementById('sectionModalTitle').innerText = `Edit ${name} Section`;
+                document.querySelector('#create-section-form input[name="name"]').value = name;
+                document.querySelector('#create-section-form input[name="name_vi"]').value = name_vi;
+                document.querySelector('#create-section-form input[name="name_zh_hant"]').value = name_zh_hant;
+                document.querySelector('#create-section-form input[name="name_zh_hans"]').value = name_zh_hans;
+                document.querySelector('#create-section-form textarea[name="description"]').value = description;
+                document.querySelector('#create-section-form textarea[name="description_vi"]').value = description_vi;
+                document.querySelector('#create-section-form textarea[name="description_zh_hant"]').value = description_zh_hant;
+                document.querySelector('#create-section-form textarea[name="description_zh_hans"]').value = description_zh_hans;
+                document.querySelector('#create-section-form input[name="icon"]').value = icon;
+                document.getElementById('section_dropdown_icon').className = `fas fa-${icon} me-2`;
+                document.getElementById('section_dropdown_label').textContent = icon;
+                document.querySelector('#create-section-form input[name="color"]').value = color;
+                document.getElementById('sectionModalSubmitButton').innerText = "Edit Section";
+                document.getElementById('sectionModalSubmitButton').onclick = async function() { await createEditSection(sectionId, order)};
+            }
+            openModal('create-section-modal');
+        }
+
+        async function createEditSection(section_id, order) {
+            const form = document.getElementById('create-section-form');
+            const formData = new FormData(form);
+
+            let order_value = section_id ? order : document.querySelectorAll('.section-item').length;
+
+            const data = {
+                factory: formData.get('factory'),
+                name: formData.get('name'),
+                name_en: formData.get('name_en'),
+                name_vi: formData.get('name_vi'),
+                name_zh_hant: formData.get('name_zh_hant'),
+                name_zh_hans: formData.get('name_zh_hans'),
+                description: formData.get('description'),
+                description_vi: formData.get('description_vi'),
+                description_zh_hant: formData.get('description_zh_hant'),
+                description_zh_hans: formData.get('description_zh_hans'),
+                icon: formData.get('icon'),
+                color: formData.get('color'),
+                order: order_value
+            };
+
+            try {
+                const url = section_id ? `/api/sections/${section_id}/update/` : '/api/sections/create/';
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    {% comment %}if (section_id) {
+                        showToast('Section changed successfully!', 'success');
+                    } else {
+                        showToast('Section created successfully!', 'success');
+                    }{% endcomment %}
+                    closeModal('create-section-modal');
+                    form.reset();
+                    location.reload();
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                showToast('Error creating section: ' + error.message, 'error');
+            }
+        }
+
+        async function createEditCard(card_id, order) {
+            const form = document.getElementById('create-card-form');
+            const formData = new FormData(form);
+
+            const order_value = card_id ? order : document.querySelectorAll(`[data-section-id="${formData.get('section_id')}"] .card-item`).length;
+
+            const data = {
+                section_id: parseInt(formData.get('section_id')),
+                name: formData.get('name'),
+                name_en: formData.get('name_en'),
+                name_vi: formData.get('name_vi'),
+                name_zh_hant: formData.get('name_zh_hant'),
+                name_zh_hans: formData.get('name_zh_hans'),
+                description: formData.get('description'),
+                description_vi: formData.get('description_vi'),
+                description_zh_hant: formData.get('description_zh_hant'),
+                description_zh_hans: formData.get('description_zh_hans'),
+                url: formData.get('url'),
+                icon: formData.get('icon'),
+                icon_color: formData.get('icon_color'),
+                status: formData.get('status'),
+                access_level: formData.get('access_level'),
+                is_external: formData.get('is_external') === 'on',
+                order: order_value
+            };
+
+            try {
+                const url = card_id ? `/api/cards/${card_id}/update/` : '/api/cards/create/';
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    {% comment %}if (card_id) {
+                        showToast('Card changed successfully!', 'success');
+                    } else {
+                        showToast('Card created successfully!', 'success');
+                    }{% endcomment %}
+                    closeModal('create-card-modal');
+                    form.reset();
+                    location.reload();
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                showToast('Error creating card: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteSection(sectionId) {
+            if (!confirm('Are you sure you want to delete this section and all its cards?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/sections/${sectionId}/delete/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Section deleted successfully!', 'success');
+                    document.querySelector(`[data-section-id="${sectionId}"]`).remove();
+                    markDirty();
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                showToast('Error deleting section: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteCard(cardId) {
+            if (!confirm('Are you sure you want to delete this card?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/cards/${cardId}/delete/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Card deleted successfully!', 'success');
+                    document.querySelector(`[data-card-id="${cardId}"]`).remove();
+                    markDirty();
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                showToast('Error deleting card: ' + error.message, 'error');
+            }
+        }
+
+        async function saveAllChanges() {
+            const form = document.getElementById("settings-form");
+            const formData = new FormData(form); // collects all fields including files
+            console.log(formData)
+
+            try {
+                const response = await fetch("/api/settings/update/", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": getCookie("csrftoken"),
+                        // don't set Content-Type here, fetch will handle multipart/form-data with FormData
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    showToast("All changes saved successfully!", "success");
+                    isDirty = false;
+                } else {
+                    throw new Error(result.error || "Unknown error");
+                }
+            } catch (error) {
+                showToast("Error saving changes: " + error.message, "error");
+            }
+        }
+
+
+        function updateFactoryOrder() {
+            const factories = Array.from(document.querySelectorAll(`.factory-item`));
+            factories.forEach((factory, index) => {
+                const factoryId = factory.dataset.factoryId;
+                // Update order via API
+                fetch(`/api/factories/${factoryId}/update/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                    body: JSON.stringify({ order: index })
+                });
+            });
+        }
+
+        function updateSectionOrder() {
+            const sections = Array.from(document.querySelectorAll('.section-item'));
+            sections.forEach((section, index) => {
+                const sectionId = section.dataset.sectionId;
+                // Update order via API
+                fetch(`/api/sections/${sectionId}/update/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                    body: JSON.stringify({ order: index })
+                });
+            });
+        }
+
+        function updateCardOrder(sectionId) {
+            const cards = Array.from(document.querySelectorAll(`[data-section-id="${sectionId}"] .card-item`));
+            cards.forEach((card, index) => {
+                const cardId = card.dataset.cardId;
+                // Update order via API
+                fetch(`/api/cards/${cardId}/update/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                    body: JSON.stringify({ order: index })
+                });
+            });
+        }
+
+        function markDirty() {
+            isDirty = true;
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            const iconInner = document.getElementById('toast-icon-inner');
+            const messageEl = document.getElementById('toast-message');
+
+            messageEl.textContent = message;
+
+            if (type === 'success') {
+                icon.className = 'w-8 h-8 rounded-full flex items-center justify-center bg-green-500';
+                iconInner.className = 'fas fa-check text-white';
+            } else {
+                icon.className = 'w-8 h-8 rounded-full flex items-center justify-center bg-red-500';
+                iconInner.className = 'fas fa-exclamation text-white';
+            }
+
+            toast.classList.remove('translate-x-full', 'opacity-0');
+            toast.classList.add('translate-x-0', 'opacity-100');
+
+            setTimeout(hideToast, 5000);
+        }
+
+        function hideToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('translate-x-0', 'opacity-100');
+            toast.classList.add('translate-x-full', 'opacity-0');
+        }
+
+        function exportSettings() {
+            const settings = {
+                portal_settings: {
+                    site_title: document.getElementById('site-title').value,
+                    theme_color: document.getElementById('theme-color').value,
+                    background_color: document.getElementById('background-color').value,
+                    show_status_indicators: document.getElementById('show-status').checked,
+                    enable_animations: document.getElementById('enable-animations').checked,
+                    maintenance_mode: document.getElementById('maintenance-mode').checked
+                },
+                export_date: new Date().toISOString()
+            };
+
+            const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'portal-settings.json';
+            a.click();
+            URL.revokeObjectURL(url);
+
+            showToast('Settings exported successfully!', 'success');
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Warn user about unsaved changes
+        window.addEventListener('beforeunload', function(e) {
+            if (isDirty) {
+                e.preventDefault();
+                e.returnValue = '';
+                return 'You have unsaved changes. Are you sure you want to leave?';
+            }
+        });
+
+        // Real-time preview updates
+        document.getElementById('site-title').addEventListener('input', function() {
+            markDirty();
+        });
+
+        document.getElementById('theme-color').addEventListener('change', function() {
+            document.documentElement.style.setProperty('--theme-color', this.value);
+            markDirty();
+        });
+
+        document.getElementById('background-color').addEventListener('change', function() {
+            document.documentElement.style.setProperty('--bg-color', this.value);
+            markDirty();
+        });
+    </script>
+{% endblock %}

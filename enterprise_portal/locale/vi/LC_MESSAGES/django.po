@@ -1,0 +1,43 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-08-16 16:08+0700\n"
+"PO-Revision-Date: 2025-08-16 16:08+0700\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: vi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 3.6\n"
+
+#: .\base\templates\base\header.html:77
+msgid "Welcome"
+msgstr "Xin chào"
+
+#: .\enterprise_portal\settings.py:130
+msgid "Taiwan"
+msgstr "Tiếng Đài"
+
+#: .\enterprise_portal\settings.py:131
+msgid "Chinese"
+msgstr "Tiếng Trung"
+
+#: .\enterprise_portal\settings.py:132
+msgid "English"
+msgstr "Tiếng Anh"
+
+#: .\enterprise_portal\settings.py:133
+msgid "Vietnamese"
+msgstr "Tiếng Việt"
+
+#~ msgid "Enterprise Management System"
+#~ msgstr "Hệ Thống Quản Lý Doanh Nghiệp"
