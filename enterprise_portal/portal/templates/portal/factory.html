@@ -491,7 +491,7 @@
                             </div>
                             <div class="systems-row">
                                 {% for card in section.filtered_cards %}
-                                    <div class="system-card group" onclick="window.location.href='{{ card.url }}'"
+                                    <div class="system-card group" onclick="openCard('{{ card.url }}', {{ card.is_external|yesno:'true,false' }}, {{ card.id }})"
                                          style="{% if section.filtered_cards|length == 1 %}grid-column: span 3{% endif %}">
                                         <div class="system-header">
                                             <div class="w-12 h-12 rounded-lg flex items-center justify-center"
@@ -520,7 +520,7 @@
                                         <div class="system-footer">
                                             <span>Online</span>
                                             <button class="edit-btn"
-                                                    onclick="window.location.href='{{ card.url }}'">
+                                                    onclick="openCard('{{ card.url }}', {{ card.is_external|yesno:'true,false' }}, {{ card.id }})">
                                                 Visit The Website
                                             </button>
                                         </div>
@@ -643,6 +643,19 @@
 
 {% block js %}
     <script>
+        // Open card function
+        function openCard(url, isExternal, cardId) {
+            // Track click
+            trackClick(cardId, url);
+
+            // Open URL
+            if (isExternal) {
+                window.open(url, '_blank');
+            } else {
+                window.location.href = url;
+            }
+        }
+
         // System data storage
         {% comment %}let systemData = {
             mes: {
