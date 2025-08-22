@@ -251,17 +251,15 @@
     // Update current time
     function updateTime() {
         const now = new Date();
-        const timeString = now.toLocaleTimeString('en-US', {
-            hour12: false,
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-        const dateString = now.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit'
-        });
-        document.getElementById('current-time').textContent = `${dateString} ${timeString}`;
+
+        const day = String(now.getDate()).padStart(2, '0');
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const year = now.getFullYear();
+
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+
+        document.getElementById('current-time').textContent = `${day}/${month}/${year} ${hours}:${minutes}`;
     }
 
     updateTime();
