@@ -759,6 +759,9 @@
                 document.getElementById('section_dropdown_icon').className = `fas fa-${icon} me-2`;
                 document.getElementById('section_dropdown_label').textContent = icon;
                 document.querySelector('#create-section-form input[name="color"]').value = color;
+                document.querySelector('#create-section-form input[name="is_active"]').checked = isActive;
+                let visibility = isActive ? "Public" : "Private";
+                document.querySelector('#create-section-form #visibilityLabel').textContent = visibility;
                 document.getElementById('sectionModalSubmitButton').innerText = "Edit Section";
                 document.getElementById('sectionModalSubmitButton').onclick = async function() { await createEditSection(sectionId, order)};
             }
@@ -784,8 +787,11 @@
                 description_zh_hans: formData.get('description_zh_hans'),
                 icon: formData.get('icon'),
                 color: formData.get('color'),
+                is_active: formData.get('is_active'),
                 order: order_value
             };
+
+            console.log(data);
 
             try {
                 const url = section_id ? `/api/sections/${section_id}/update/` : '/api/sections/create/';

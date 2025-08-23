@@ -105,83 +105,85 @@
 
         <!-- Portal Sections -->
         {% for section in sections %}
-        <div class="mb-12 fade-in-up stagger-{{ forloop.counter }}">
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden {% if is_edit_mode %}edit-mode-overlay{% endif %}">
-                <!-- Section Header -->
-                <div class="px-6 py-4 border-b border-gray-100" style="background: linear-gradient(135deg, {{ section.color }}10 0%, {{ section.color }}05 100%);">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background-color: {{ section.color }};">
-                            <i class="fas fa-{{ section.icon }} text-white text-sm"></i>
+            {% if section.is_active %}
+                <div class="mb-12 fade-in-up stagger-{{ forloop.counter }}">
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden {% if is_edit_mode %}edit-mode-overlay{% endif %}">
+                        <!-- Section Header -->
+                        <div class="px-6 py-4 border-b border-gray-100" style="background: linear-gradient(135deg, {{ section.color }}10 0%, {{ section.color }}05 100%);">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background-color: {{ section.color }};">
+                                    <i class="fas fa-{{ section.icon }} text-white text-sm"></i>
+                                </div>
+                                <div>
+                                    <h2 class="text-lg font-semibold text-gray-900">{{ section.translated_name }}</h2>
+                                    {% if section.description %}
+                                        <p class="text-sm text-gray-600">{{ section.translated_description }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <h2 class="text-lg font-semibold text-gray-900">{{ section.translated_name }}</h2>
-                            {% if section.description %}
-                                <p class="text-sm text-gray-600">{{ section.translated_description }}</p>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Section Cards -->
-                <div class="p-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {% for card in section.filtered_cards %}
-                        <div class="bg-white rounded-xl border border-gray-200 p-6 card-hover cursor-pointer group"
-                             onclick="openCard('{{ card.url }}', {{ card.is_external|yesno:'true,false' }}, {{ card.id }})">
-                            <div class="flex items-start justify-between mb-4">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-12 h-12 rounded-lg flex items-center justify-center"
-                                         style="background-color: {{ card.icon_color }}20;">
-                                        <i class="fas fa-{{ card.icon }} text-xl" style="color: {{ card.icon_color }};"></i>
-                                    </div>
-                                    <div class="flex-1">
-                                        <h3 class="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-                                            {{ card.translated_name }}
-                                        </h3>
-                                        {% if card.description %}
-                                            <p class="text-sm text-gray-600 mt-1">{{ card.translated_description }}</p>
+                        <!-- Section Cards -->
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {% for card in section.filtered_cards %}
+                                <div class="bg-white rounded-xl border border-gray-200 p-6 card-hover cursor-pointer group"
+                                     onclick="openCard('{{ card.url }}', {{ card.is_external|yesno:'true,false' }}, {{ card.id }})">
+                                    <div class="flex items-start justify-between mb-4">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-12 h-12 rounded-lg flex items-center justify-center"
+                                                 style="background-color: {{ card.icon_color }}20;">
+                                                <i class="fas fa-{{ card.icon }} text-xl" style="color: {{ card.icon_color }};"></i>
+                                            </div>
+                                            <div class="flex-1">
+                                                <h3 class="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                                                    {{ card.translated_name }}
+                                                </h3>
+                                                {% if card.description %}
+                                                    <p class="text-sm text-gray-600 mt-1">{{ card.translated_description }}</p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        {% if settings.show_status_indicators %}
+                                        <div class="flex items-center space-x-2">
+                                            <div class="w-2 h-2 rounded-full status-{{ card.status }}"></div>
+                                            <span class="text-xs text-gray-500 capitalize">{{ card.status }}</span>
+                                        </div>
                                         {% endif %}
                                     </div>
-                                </div>
 
-                                {% if settings.show_status_indicators %}
-                                <div class="flex items-center space-x-2">
-                                    <div class="w-2 h-2 rounded-full status-{{ card.status }}"></div>
-                                    <span class="text-xs text-gray-500 capitalize">{{ card.status }}</span>
+                                    <div class="flex items-center justify-between text-sm text-gray-500">
+                                        <span>{{ card.status|capfirst }}</span>
+                                        <i class="fas fa-external-link-alt opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    </div>
                                 </div>
-                                {% endif %}
-                            </div>
-
-                            <div class="flex items-center justify-between text-sm text-gray-500">
-                                <span>{{ card.status|capfirst }}</span>
-                                <i class="fas fa-external-link-alt opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                {% empty %}
+                                <div class="col-span-3 text-center py-8 text-gray-500">
+                                    <i class="fas fa-inbox text-4xl mb-4 opacity-50"></i>
+                                    <p>No systems available in this section</p>
+                                </div>
+                                {% endfor %}
                             </div>
                         </div>
-                        {% empty %}
-                        <div class="col-span-3 text-center py-8 text-gray-500">
-                            <i class="fas fa-inbox text-4xl mb-4 opacity-50"></i>
-                            <p>No systems available in this section</p>
-                        </div>
-                        {% endfor %}
                     </div>
                 </div>
-            </div>
-        </div>
-        {% empty %}
-        <div class="text-center py-16">
-            <div class="max-w-md mx-auto">
-                <i class="fas fa-plus-circle text-6xl text-gray-300 mb-4"></i>
-                <h3 class="text-xl font-medium text-gray-900 mb-2">No Sections Available</h3>
-                <p class="text-gray-600 mb-6">Start by creating your first portal section</p>
-                {% if user.is_staff %}
-                    <a href="{% url 'edit_mode' %}"
-                       class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                        <i class="fas fa-edit mr-2"></i>
-                        Create Section
-                    </a>
-                {% endif %}
-            </div>
-        </div>
+            {% endif %}
+            {% empty %}
+                <div class="text-center py-16">
+                    <div class="max-w-md mx-auto">
+                        <i class="fas fa-plus-circle text-6xl text-gray-300 mb-4"></i>
+                        <h3 class="text-xl font-medium text-gray-900 mb-2">No Sections Available</h3>
+                        <p class="text-gray-600 mb-6">Start by creating your first portal section</p>
+                        {% if user.is_staff %}
+                            <a href="{% url 'edit_mode' %}"
+                               class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-edit mr-2"></i>
+                                Create Section
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
         {% endfor %}
     </main>
 

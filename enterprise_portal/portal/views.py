@@ -372,6 +372,17 @@ def update_section(request, section_id):
                 except:
                     value = None
                 setattr(section, field, value)
+
+            elif field == "is_active":
+                try:
+                    if data.get('is_active') == 'on':
+                        value = True
+                    else:
+                        value = False
+                except:
+                    value = False
+                setattr(section, field, value)
+
             elif hasattr(section, field):
                 setattr(section, field, value)
 

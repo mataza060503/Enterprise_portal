@@ -1,3 +1,54 @@
+<style>
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 28px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: 0.4s;
+        border-radius: 34px;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 20px;
+        width: 20px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+    }
+
+    input:checked + .slider {
+        background-color: #007bff;
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(22px);
+    }
+
+    .custom-control-input:checked ~ .custom-control-label::after {
+        transform: translateX(1rem);
+    }
+</style>
+
 <!-- Section Modal -->
 <div id="create-section-modal" class="fixed inset-0 modal-backdrop hidden z-50">
     <div class="flex items-center justify-center min-h-screen px-4">
@@ -129,9 +180,20 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Icon Background Color</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Icon Color</label>
                         <input type="color" name="color" value="#10b981"
                                class="w-full h-10 border border-gray-300 rounded-lg cursor-pointer">
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-3">
+                    <label class="block text-sm font-medium text-gray-700">Visibility:</label>
+                    <div class="d-flex align-items-center">
+                        <label class="switch m-0">
+                            <input type="checkbox" name="is_active" id="visibilityToggle">
+                            <span class="slider round"></span>
+                        </label>
+                        <span id="visibilityLabel" class="ml-2 font-weight-bold">Public</span>
                     </div>
                 </div>
             </form>
@@ -151,6 +213,19 @@
 </div>
 
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const toggle = document.getElementById('visibilityToggle');
+        const label = document.getElementById('visibilityLabel');
+
+        if (toggle && label) {
+            label.textContent = toggle.checked ? 'Public' : 'Private';
+
+            toggle.addEventListener('change', function () {
+                label.textContent = this.checked ? 'Public' : 'Private';
+            });
+        }
+    });
+
     document.querySelectorAll(".icon-option").forEach(option => {
         option.addEventListener("click", () => {
             // remove old active
