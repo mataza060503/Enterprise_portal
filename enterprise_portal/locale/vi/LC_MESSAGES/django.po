@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-16 16:08+0700\n"
-"PO-Revision-Date: 2025-08-16 16:08+0700\n"
+"POT-Creation-Date: 2025-08-23 08:59+0700\n"
+"PO-Revision-Date: 2025-08-23 09:03+0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: vi\n"
@@ -17,19 +17,32 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 3.6\n"
+"X-Generator: Poedit 3.7\n"
 
-#: .\base\templates\base\header.html:77
+#: .\base\templates\base\footer.html:5
+msgid "All rights reserved"
+msgstr "Bản quyền đã được bảo lưu"
+
+#: .\base\templates\base\header.html:25 .\portal\templates\portal\home.html:5
+msgid "Enterprise Systems Portal"
+msgstr "Cổng Hệ thống Doanh nghiệp"
+
+#: .\base\templates\base\header.html:189
 msgid "Welcome"
 msgstr "Xin chào"
 
+#: .\base\templates\base\header.html:193
+#: .\portal\templates\portal\edit_mode.html:5
+msgid "Edit Mode"
+msgstr "Chỉnh Sửa"
+
 #: .\enterprise_portal\settings.py:130
-msgid "Taiwan"
-msgstr "Tiếng Đài"
+msgid "Traditional Chinese"
+msgstr ""
 
 #: .\enterprise_portal\settings.py:131
-msgid "Chinese"
-msgstr "Tiếng Trung"
+msgid "Simplified Chinese"
+msgstr ""
 
 #: .\enterprise_portal\settings.py:132
 msgid "English"
@@ -39,5 +52,12 @@ msgstr "Tiếng Anh"
 msgid "Vietnamese"
 msgstr "Tiếng Việt"
 
-#~ msgid "Enterprise Management System"
-#~ msgstr "Hệ Thống Quản Lý Doanh Nghiệp"
+#: .\portal\templates\portal\factory.html:5
+msgid "Factory Systems Portal"
+msgstr "Cổng Hệ thống Nhà máy"
+
+#~ msgid "Taiwan"
+#~ msgstr "Tiếng Đài"
+
+#~ msgid "Chinese"
+#~ msgstr "Tiếng Trung"
