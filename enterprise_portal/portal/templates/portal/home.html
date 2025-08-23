@@ -115,8 +115,8 @@
                         <!-- Section Header -->
                         <div class="px-6 py-4 border-b border-gray-100" style="background: linear-gradient(135deg, {{ section.color }}10 0%, {{ section.color }}05 100%);">
                             <div class="flex items-center space-x-3">
-                                <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background-color: {{ section.color }};">
-                                    <i class="fas fa-{{ section.icon }} text-white text-sm"></i>
+                                <div class="w-11 h-11 rounded-lg flex items-center justify-center" style="background-color: {{ section.color }};">
+                                    <i class="fas fa-{{ section.icon }} text-white text-lg"></i>
                                 </div>
                                 <div>
                                     <h2 class="text-lg font-semibold text-gray-900">{{ section.translated_name }}</h2>
@@ -134,7 +134,7 @@
                                 <div class="bg-white rounded-xl border border-gray-200 p-6 card-hover cursor-pointer group"
                                      onclick="openCard('{{ card.url }}', {{ card.is_external|yesno:'true,false' }}, {{ card.id }})">
                                     <div class="flex items-start justify-between mb-4">
-                                        <div class="flex items-center space-x-3">
+                                        <div class="flex items-start space-x-3">
                                             <div class="w-12 h-12 rounded-lg flex items-center justify-center"
                                                  style="background-color: {{ card.icon_color }}20;">
                                                 <i class="fas fa-{{ card.icon }} text-xl" style="color: {{ card.icon_color }};"></i>
