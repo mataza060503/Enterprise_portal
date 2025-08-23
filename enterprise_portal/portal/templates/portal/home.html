@@ -89,7 +89,6 @@
         <!-- Factory Buttons -->
         {% if factory_buttons %}
         <div class="mb-12 fade-in-up">
-            <h2 class="text-lg font-medium text-gray-900 mb-6 text-center">Factory</h2>
             <div class="flex justify-center space-x-4 flex-wrap gap-4">
                 {% for button in factory_buttons %}
                 <a href="{% url 'factory' %}?id={{ button.pk }}"
