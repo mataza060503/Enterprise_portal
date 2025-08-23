@@ -154,23 +154,34 @@
                                  onclick="document.getElementById('background-image').click()">
                         </div>
 
-                        <div class="flex items-center space-x-3">
-                            <input type="checkbox" name="show_status_indicators" id="show-status" {{ settings.show_status_indicators|yesno:'checked,' }}
-                                   class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            <label for="show-status" class="text-sm text-gray-700">Show Status Indicators</label>
-                        </div>
-
-                        <div class="flex items-center space-x-3">
-                            <input type="checkbox" name="enable_animations" id="enable-animations" {{ settings.enable_animations|yesno:'checked,' }}
-                                   class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            <label for="enable-animations" class="text-sm text-gray-700">Enable Animations</label>
-                        </div>
-
-                        <div class="flex items-center space-x-3 hidden">
-                            <input type="checkbox" name="maintenance_mode" id="maintenance-mode" {{ settings.maintenance_mode|yesno:'checked,' }}
-                                   class="rounded border-gray-300 text-red-600 focus:ring-red-500">
-                            <label for="maintenance-mode" class="text-sm text-gray-700">Maintenance Mode</label>
-                        </div>
+{#                        <div class="flex items-center space-x-3">#}
+{#                            <div class="d-flex align-items-center">#}
+{#                                <label class="switch m-0">#}
+{#                                    <input type="checkbox" name="show_status_indicators"#}
+{#                                           id="show-status" {{ settings.show_status_indicators|yesno:'checked,' }}>#}
+{#                                    <span class="slider round"></span>#}
+{#                                </label>#}
+{#                                <span id="showStatusLabel" class="block text-sm font-medium text-gray-700 ml-2">Show Status Indicators</span>#}
+{#                            </div>#}
+{#                        </div>#}
+{##}
+{#                        <div class="flex items-center space-x-3">#}
+{#                            <div class="d-flex align-items-center">#}
+{#                                <label class="switch m-0">#}
+{#                                    <input type="checkbox" name="enable_animations"#}
+{#                                           id="enable-animations" {{ settings.enable_animations|yesno:'checked,' }}>#}
+{#                                    <span class="slider round"></span>#}
+{#                                </label>#}
+{#                                <span id="enableAnimationsLabel" class="block text-sm font-medium text-gray-700 ml-2">Enable Animations</span>#}
+{#                            </div>#}
+{#                        </div>#}
+{##}
+{#                        <div class="flex items-center space-x-3">#}
+{#                            <input type="checkbox" name="maintenance_mode"#}
+{#                                   id="maintenance-mode" {{ settings.maintenance_mode|yesno:'checked,' }}#}
+{#                                   class="rounded border-gray-300 text-red-600 focus:ring-red-500">#}
+{#                            <label for="maintenance-mode" class="text-sm text-gray-700">Maintenance Mode</label>#}
+{#                        </div>#}
 
                     </form>
 
