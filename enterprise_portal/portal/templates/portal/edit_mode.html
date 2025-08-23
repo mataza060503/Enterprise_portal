@@ -204,8 +204,8 @@
                         <div class="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-t-xl">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-3">
-                                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
-                                        <i class="fas fa-industry text-white text-sm"></i>
+                                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+                                        <i class="fas fa-industry text-white text-lg"></i>
                                     </div>
                                     <div>
                                         <h3 class="text-lg font-semibold text-gray-900">Factory Buttons</h3>
@@ -224,7 +224,7 @@
                                 <div class="group relative bg-gradient-to-br from-gray-50 to-gray-100 border-2 border-gray-200 rounded-xl p-4 hover:border-purple-300 transition-all duration-300 hover:shadow-md factory-item cursor-move"
                                      data-factory-id="{{ factory.id }}" style="background: linear-gradient(135deg, {{ factory.background_color }}20, {{ factory.background_color }}10);">
                                     <div class="flex items-start justify-between mb-3">
-                                        <div class="flex items-center space-x-3 flex-1">
+                                        <div class="flex items-start space-x-3 flex-1">
                                             <div class="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm"
                                                  style="background-color: {{ factory.background_color }};">
                                                 <i class="fas fa-{{ factory.icon }} text-xl" style="color: {{ factory.text_color }};"></i>
@@ -289,9 +289,9 @@
                         <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 rounded-t-xl">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-3">
-                                    <div class="w-8 h-8 rounded-lg flex items-center justify-center cursor-move"
+                                    <div class="w-10 h-10 rounded-lg flex items-center justify-center cursor-move"
                                          style="background-color: {{ section.color }};">
-                                        <i class="fas fa-{{ section.icon }} text-white text-sm"></i>
+                                        <i class="fas fa-{{ section.icon }} text-white text-lg"></i>
                                     </div>
                                     <div>
                                         <h3 class="text-lg font-semibold text-gray-900 editable-title"
@@ -329,7 +329,7 @@
                                 <div class="bg-white border-2 border-gray-200 rounded-xl p-4 card-item hover:border-blue-300 transition-colors cursor-move"
                                      data-card-id="{{ card.id }}">
                                     <div class="flex items-start justify-between mb-3">
-                                        <div class="flex items-center space-x-3">
+                                        <div class="flex items-start space-x-3">
                                             <div class="w-10 h-10 rounded-lg flex items-center justify-center"
                                                  style="background-color: {{ card.icon_color }}20;">
                                                 <i class="fas fa-{{ card.icon }}" style="color: {{ card.icon_color }};"></i>
